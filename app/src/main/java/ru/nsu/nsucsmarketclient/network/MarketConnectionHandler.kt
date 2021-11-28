@@ -1,8 +1,11 @@
 package ru.nsu.nsucsmarketclient.network
 
+import java.util.Timer
+import kotlin.concurrent.schedule
+
 class MarketConnectionHandler {
     // time in seconds
-    private val pingTimeDelta = 20f;
+    private val pingTimeDelta : Long = 15000;
 
     private var isActive = false;
     private var secretKey = "";
@@ -10,5 +13,8 @@ class MarketConnectionHandler {
 
     fun connect(secretKey: String) {
         this.secretKey = secretKey;
+        Timer("Ping", false).schedule(3000, pingTimeDelta) {
+            queue.SendRequest(MarketRequest("ping?key=$secretKey") { })
+        }
     }
 }
