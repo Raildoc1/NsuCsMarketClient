@@ -6,7 +6,7 @@ import java.util.*
 import kotlin.concurrent.schedule
 
 class MarketRequestQueue {
-    private val minRequestTimeDelta : Long = 3000;
+    private val minRequestTimeDelta : Long = 1000;
 
     private val queue: Queue<MarketRequest> = LinkedList();
 
@@ -16,7 +16,9 @@ class MarketRequestQueue {
                 var request = queue.poll();
                 Log.d("Web", "Request: ${request.getURI()}");
                 val url = URL(request.getURI());
-                Log.d("Web", "Response: ${url.readText()}");
+                val response = url.readText();
+                Log.d("Web", "Response: $response");
+                request.run(response);
             } else {
                 Log.d("Info", "nothing to send!");
             }
