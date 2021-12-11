@@ -1,6 +1,7 @@
 package ru.nsu.nsucsmarketclient
 
 import android.os.Bundle
+import android.util.Log
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
@@ -11,6 +12,7 @@ import android.view.Menu
 import android.view.MenuItem
 import ru.nsu.nsucsmarketclient.network.MarketConnectionHandler
 import ru.nsu.nsucsmarketclient.databinding.ActivityMainBinding
+import ru.nsu.nsucsmarketclient.network.models.ItemModel
 
 class MainActivity : AppCompatActivity() {
 
@@ -22,6 +24,7 @@ class MainActivity : AppCompatActivity() {
 
         var connection = MarketConnectionHandler();
         connection.connect(BuildConfig.MCS_KEY);
+        connection.setOnItemsReceivedListener {l -> run { Log.d("Info", "list: $l") }}
 
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
