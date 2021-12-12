@@ -16,18 +16,20 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import ru.nsu.nsucsmarketclient.network.MarketConnectionHandler
 import ru.nsu.nsucsmarketclient.network.MarketRequest
+import ru.nsu.nsucsmarketclient.network.models.InventoryItemModel
 import ru.nsu.nsucsmarketclient.network.models.ItemModel
+import ru.nsu.nsucsmarketclient.view.InventoryRecycleViewAdapter
 import ru.nsu.nsucsmarketclient.view.RecycleViewAdapter
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.concurrent.schedule
 
-class MainActivity : AppCompatActivity() {
+class InventoryActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
 
     private lateinit var recyclerView: RecyclerView
-    private lateinit var recyclerViewAdapter: RecycleViewAdapter
+    private lateinit var recyclerViewAdapter: InventoryRecycleViewAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,21 +37,21 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         recyclerView = findViewById(R.id.recycleView)
-        recyclerViewAdapter = RecycleViewAdapter()
+        recyclerViewAdapter = InventoryRecycleViewAdapter()
 
         recyclerView.setHasFixedSize(true)
-        var layoutManager : RecyclerView.LayoutManager = LinearLayoutManager(applicationContext)
+        val layoutManager : RecyclerView.LayoutManager = LinearLayoutManager(applicationContext)
         recyclerView.layoutManager = layoutManager
         recyclerView.itemAnimator = DefaultItemAnimator()
         recyclerView.adapter = recyclerViewAdapter
 
-        var connection = MarketConnectionHandler()
+        val connection = MarketConnectionHandler()
         connection.connect(BuildConfig.MCS_KEY)
-        connection.setOnItemsReceivedListener { l -> setList(l) }
+        connection.setOnInventoryReceivedListener { l -> setList(l) }
 
-        var fab = findViewById<FloatingActionButton>(R.id.fab)
+        val fab = findViewById<FloatingActionButton>(R.id.fab)
         fab.setOnClickListener {
-            var intent = Intent(this, InventoryActivity::class.java)
+            val intent = Intent(this, MainActivity::class.java)
             connection.stop()
             startActivity(intent)
         }
@@ -77,7 +79,7 @@ class MainActivity : AppCompatActivity() {
                 || super.onSupportNavigateUp()
     }
 
-    private fun setList(items : List<ItemModel>) {
+    private fun setList(items : List<InventoryItemModel>) {
         recyclerViewAdapter.updateList(items)
         recyclerViewAdapter.notifyDataSetChanged()
     }
