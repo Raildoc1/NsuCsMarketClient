@@ -2,43 +2,48 @@ package ru.nsu.nsucsmarketclient
 
 import android.os.Bundle
 import android.util.Log
-import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.setupActionBarWithNavController
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import ru.nsu.nsucsmarketclient.network.MarketConnectionHandler
-import ru.nsu.nsucsmarketclient.databinding.ActivityMainBinding
+import ru.nsu.nsucsmarketclient.network.MarketRequest
 import ru.nsu.nsucsmarketclient.network.models.ItemModel
+import ru.nsu.nsucsmarketclient.view.RecycleViewAdapter
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.concurrent.schedule
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
-    private lateinit var binding: ActivityMainBinding
+
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var recyclerViewAdapter: RecycleViewAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        var connection = MarketConnectionHandler();
-        connection.connect(BuildConfig.MCS_KEY);
-        connection.setOnItemsReceivedListener {l -> run { Log.d("Info", "list: $l") }}
+        setContentView(R.layout.activity_main)
 
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+        recyclerView = findViewById(R.id.recycleView)
+        recyclerViewAdapter = RecycleViewAdapter()
 
-        setSupportActionBar(binding.toolbar)
+        recyclerView.setHasFixedSize(true)
+        var layoutManager : RecyclerView.LayoutManager = LinearLayoutManager(applicationContext)
+        recyclerView.layoutManager = layoutManager
+        recyclerView.itemAnimator = DefaultItemAnimator()
+        recyclerView.adapter = recyclerViewAdapter
 
-        val navController = findNavController(R.id.nav_host_fragment_content_main)
-        appBarConfiguration = AppBarConfiguration(navController.graph)
-        setupActionBarWithNavController(navController, appBarConfiguration)
-
-        binding.fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show()
-        }
+        var connection = MarketConnectionHandler()
+        connection.connect(BuildConfig.MCS_KEY)
+        connection.setOnItemsReceivedListener { l -> setList(l) }
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -61,5 +66,10 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         return navController.navigateUp(appBarConfiguration)
                 || super.onSupportNavigateUp()
+    }
+
+    private fun setList(items : List<ItemModel>) {
+        recyclerViewAdapter.updateList(items)
+        recyclerViewAdapter.notifyDataSetChanged()
     }
 }

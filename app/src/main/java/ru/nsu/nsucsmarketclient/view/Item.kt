@@ -1,4 +1,4 @@
 package ru.nsu.nsucsmarketclient.view
 
-open class Item (id : Int, classId : Int, name : String) {
+open class Item (name : String, price : Int) {
 }

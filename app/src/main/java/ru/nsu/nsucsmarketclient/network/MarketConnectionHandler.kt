@@ -1,5 +1,7 @@
 package ru.nsu.nsucsmarketclient.network
 
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import com.google.gson.Gson
 import ru.nsu.nsucsmarketclient.network.models.ItemModel
@@ -28,9 +30,12 @@ class MarketConnectionHandler {
                 if(::onItemsReceived.isInitialized)
                 {
                     try {
-                        var gson = Gson();
-                        var response = gson.fromJson(s, ItemsListResponse::class.java)
-                        onItemsReceived(response.items);
+                        val gson = Gson();
+                        val response = gson.fromJson(s, ItemsListResponse::class.java)
+
+                        Handler(Looper.getMainLooper()).post {
+                            onItemsReceived(response.items)
+                        }
                     } catch (e : Exception) {
                         Log.d("IO", "An exception occurred while parsing a response: ${e.message}");
                     }
