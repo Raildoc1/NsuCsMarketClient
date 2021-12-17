@@ -19,14 +19,18 @@ import ru.nsu.nsucsmarketclient.network.models.ItemModel
 import java.io.InputStream
 import java.net.URL
 
-class InventoryRecycleViewAdapter : RecyclerView.Adapter<InventoryRecycleViewAdapter.ViewHolder> () {
+class InventoryRecycleViewAdapter(private val onItemClick: (String) -> Unit) : RecyclerView.Adapter<InventoryRecycleViewAdapter.ViewHolder> () {
 
     private val dataSet = ArrayList<InventoryItemModel>()
     private lateinit var context : Context
 
-    class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+    class ViewHolder(view: View, private val onItemClick: (String) -> Unit) : RecyclerView.ViewHolder(view) {
         val name: TextView = view.findViewById(R.id.tvName)
         val icon: ImageView = view.findViewById(R.id.ivItem)
+
+        fun bind(itemId: String) {
+            itemView.setOnClickListener{ onItemClick(itemId) }
+        }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -35,12 +39,14 @@ class InventoryRecycleViewAdapter : RecyclerView.Adapter<InventoryRecycleViewAda
 
         context = parent.context;
 
-        return ViewHolder(view)
+        return ViewHolder(view, onItemClick)
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+
         val item = dataSet[position]
-        holder.name.text = item.market_hash_name;
+        holder.name.text = item.market_hash_name
+        holder.bind(item.id)
         Thread {
             var d : Drawable? = try {
                 val imagesDao = AppDatabase.getDatabase(context).imagesDao()
@@ -56,7 +62,6 @@ class InventoryRecycleViewAdapter : RecyclerView.Adapter<InventoryRecycleViewAda
             Handler(Looper.getMainLooper()).post {
                 holder.icon.setImageDrawable(d)
             }
-
         }.start()
     }
 

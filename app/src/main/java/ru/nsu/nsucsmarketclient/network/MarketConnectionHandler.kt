@@ -76,6 +76,11 @@ class MarketConnectionHandler {
         }
     }
 
+    fun addToSale(id: String, price: Long) {
+        var priceStr : String = "${price * 100}"
+        queue.SendRequest(MarketRequest("add-to-sale?key=$secretKey&id=$id&price=$priceStr&cur=RUB") { })
+    }
+
     fun setOnItemsReceivedListener(action : (List<ItemModel>) -> Unit) {
         onItemsReceived = action
     }
