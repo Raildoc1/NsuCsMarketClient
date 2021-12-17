@@ -17,8 +17,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import ru.nsu.nsucsmarketclient.network.MarketConnectionHandler
 import ru.nsu.nsucsmarketclient.network.models.InventoryItemModel
 import ru.nsu.nsucsmarketclient.view.InventoryRecycleViewAdapter
-import java.util.*
-import android.content.DialogInterface
 
 import android.widget.EditText
 
@@ -40,12 +38,10 @@ class InventoryActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         recyclerView = findViewById(R.id.recycleView)
-        recyclerViewAdapter = InventoryRecycleViewAdapter {
-            Log.d("Debug", "$it")
-
+        recyclerViewAdapter = InventoryRecycleViewAdapter { name: String, itemId: String ->
             val alert: AlertDialog.Builder = AlertDialog.Builder(this)
 
-            alert.setTitle("Title")
+            alert.setTitle(name)
             alert.setMessage("Set price (RUB):")
 
             val input = EditText(this)
@@ -56,7 +52,7 @@ class InventoryActivity : AppCompatActivity() {
 
                 try {
                     val price = value.toLong()
-                    connection.addToSale(it, price)
+                    connection.addToSale(itemId, price)
                 } catch (e : Exception) { }
             }
 

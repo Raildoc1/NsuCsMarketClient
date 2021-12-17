@@ -19,17 +19,17 @@ import ru.nsu.nsucsmarketclient.network.models.ItemModel
 import java.io.InputStream
 import java.net.URL
 
-class InventoryRecycleViewAdapter(private val onItemClick: (String) -> Unit) : RecyclerView.Adapter<InventoryRecycleViewAdapter.ViewHolder> () {
+class InventoryRecycleViewAdapter(private val onItemClick: (String, String) -> Unit) : RecyclerView.Adapter<InventoryRecycleViewAdapter.ViewHolder> () {
 
     private val dataSet = ArrayList<InventoryItemModel>()
     private lateinit var context : Context
 
-    class ViewHolder(view: View, private val onItemClick: (String) -> Unit) : RecyclerView.ViewHolder(view) {
+    class ViewHolder(view: View, private val onItemClick: (String, String) -> Unit) : RecyclerView.ViewHolder(view) {
         val name: TextView = view.findViewById(R.id.tvName)
         val icon: ImageView = view.findViewById(R.id.ivItem)
 
-        fun bind(itemId: String) {
-            itemView.setOnClickListener{ onItemClick(itemId) }
+        fun bind(itemName: String, itemId: String) {
+            itemView.setOnClickListener{ onItemClick(itemName, itemId) }
         }
     }
 
@@ -46,7 +46,7 @@ class InventoryRecycleViewAdapter(private val onItemClick: (String) -> Unit) : R
 
         val item = dataSet[position]
         holder.name.text = item.market_hash_name
-        holder.bind(item.id)
+        holder.bind(item.market_hash_name, item.id)
         Thread {
             var d : Drawable? = try {
                 val imagesDao = AppDatabase.getDatabase(context).imagesDao()
