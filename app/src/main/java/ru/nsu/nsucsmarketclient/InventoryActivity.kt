@@ -3,7 +3,6 @@ package ru.nsu.nsucsmarketclient
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -19,24 +18,40 @@ import ru.nsu.nsucsmarketclient.network.models.InventoryItemModel
 import ru.nsu.nsucsmarketclient.view.InventoryRecycleViewAdapter
 
 import android.widget.EditText
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 
 
 class InventoryActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
-
     private lateinit var recyclerView: RecyclerView
     private lateinit var recyclerViewAdapter: InventoryRecycleViewAdapter
+    private lateinit var connection: MarketConnectionHandler
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_inventory)
+        initConnection()
+        initRecyclerView()
+        initRefresh()
+        initFAB()
+    }
 
-        val connection = MarketConnectionHandler()
+    private fun initRefresh() {
+        swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout)
+        swipeRefreshLayout.setOnRefreshListener {
+            connection.updateInventoryItems()
+        }
+    }
+
+    private fun initConnection() {
+        connection = MarketConnectionHandler()
         connection.connect(BuildConfig.MCS_KEY)
-        connection.setOnInventoryReceivedListener { l -> setList(l) }
+        connection.setOnInventoryReceivedListener { l -> setList(l); swipeRefreshLayout.isRefreshing = false }
+    }
 
-        setContentView(R.layout.activity_main)
-
+    private fun initRecyclerView() {
         recyclerView = findViewById(R.id.recycleView)
         recyclerViewAdapter = InventoryRecycleViewAdapter { name: String, itemId: String ->
             val alert: AlertDialog.Builder = AlertDialog.Builder(this)
@@ -66,7 +81,9 @@ class InventoryActivity : AppCompatActivity() {
         recyclerView.layoutManager = layoutManager
         recyclerView.itemAnimator = DefaultItemAnimator()
         recyclerView.adapter = recyclerViewAdapter
+    }
 
+    private fun initFAB() {
         val fab = findViewById<FloatingActionButton>(R.id.fab)
         fab.setOnClickListener {
             val intent = Intent(this, MainActivity::class.java)
@@ -76,15 +93,11 @@ class InventoryActivity : AppCompatActivity() {
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.menu_main, menu)
         return true
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         return when (item.itemId) {
             R.id.action_settings -> true
             else -> super.onOptionsItemSelected(item)

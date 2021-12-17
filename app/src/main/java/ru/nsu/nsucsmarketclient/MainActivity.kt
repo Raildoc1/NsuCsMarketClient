@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.room.Room
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -38,37 +39,54 @@ import kotlin.concurrent.schedule
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
-
     private lateinit var recyclerView: RecyclerView
     private lateinit var recyclerViewAdapter: RecycleViewAdapter
-
-    private lateinit var mImageRefViewModel: ImageRefViewModel
+    private lateinit var connection: MarketConnectionHandler
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.activity_main)
+        initConnection()
+        initRecyclerView()
+        initRefresh()
+        initFAB()
+        fillTestDatabase()
+    }
 
+    private fun initRefresh() {
+        swipeRefreshLayout = findViewById(R.id.swipeRefreshLayout)
+        swipeRefreshLayout.setOnRefreshListener {
+            connection.updateSaleItems()
+        }
+    }
+
+    private fun initConnection() {
+        connection = MarketConnectionHandler()
+        connection.connect(BuildConfig.MCS_KEY)
+        connection.setOnItemsReceivedListener { l -> setList(l); swipeRefreshLayout.isRefreshing = false }
+    }
+
+    private fun initRecyclerView() {
         recyclerView = findViewById(R.id.recycleView)
         recyclerViewAdapter = RecycleViewAdapter()
-
         recyclerView.setHasFixedSize(true)
         var layoutManager : RecyclerView.LayoutManager = LinearLayoutManager(applicationContext)
         recyclerView.layoutManager = layoutManager
         recyclerView.itemAnimator = DefaultItemAnimator()
         recyclerView.adapter = recyclerViewAdapter
+    }
 
-        var connection = MarketConnectionHandler()
-        connection.connect(BuildConfig.MCS_KEY)
-        connection.setOnItemsReceivedListener { l -> setList(l) }
-
+    private fun initFAB() {
         var fab = findViewById<FloatingActionButton>(R.id.fab)
         fab.setOnClickListener {
             var intent = Intent(this, InventoryActivity::class.java)
             connection.stop()
             startActivity(intent)
         }
+    }
 
+    private fun fillTestDatabase() {
         lifecycleScope.launch (Dispatchers.IO) {
             val imagesDao = AppDatabase.getDatabase(application).imagesDao()
 
