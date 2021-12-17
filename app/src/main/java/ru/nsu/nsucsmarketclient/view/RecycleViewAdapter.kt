@@ -2,7 +2,6 @@ package ru.nsu.nsucsmarketclient.view
 
 import android.content.Context
 import android.graphics.drawable.Drawable
-import android.os.AsyncTask
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
@@ -15,14 +14,7 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.RecyclerView
 import ru.nsu.nsucsmarketclient.R
 import ru.nsu.nsucsmarketclient.network.models.ItemModel
-import androidx.core.content.res.ResourcesCompat
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
-import ru.nsu.nsucsmarketclient.BuildConfig
 import ru.nsu.nsucsmarketclient.database.AppDatabase
-import ru.nsu.nsucsmarketclient.database.ImageRef
 import java.io.InputStream
 import java.net.URL
 

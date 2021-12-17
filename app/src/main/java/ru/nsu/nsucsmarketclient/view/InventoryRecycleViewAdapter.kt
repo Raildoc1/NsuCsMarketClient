@@ -15,7 +15,6 @@ import androidx.recyclerview.widget.RecyclerView
 import ru.nsu.nsucsmarketclient.R
 import ru.nsu.nsucsmarketclient.database.AppDatabase
 import ru.nsu.nsucsmarketclient.network.models.InventoryItemModel
-import ru.nsu.nsucsmarketclient.network.models.ItemModel
 import java.io.InputStream
 import java.net.URL
 
@@ -43,7 +42,6 @@ class InventoryRecycleViewAdapter(private val onItemClick: (String, String) -> U
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-
         val item = dataSet[position]
         holder.name.text = item.market_hash_name
         holder.bind(item.market_hash_name, item.id)

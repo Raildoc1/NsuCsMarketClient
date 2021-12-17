@@ -4,11 +4,6 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.navigateUp
-import android.view.Menu
-import android.view.MenuItem
 import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -20,10 +15,8 @@ import ru.nsu.nsucsmarketclient.view.InventoryRecycleViewAdapter
 import android.widget.EditText
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 
-
 class InventoryActivity : AppCompatActivity() {
 
-    private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var recyclerView: RecyclerView
     private lateinit var recyclerViewAdapter: InventoryRecycleViewAdapter
     private lateinit var connection: MarketConnectionHandler
@@ -57,21 +50,23 @@ class InventoryActivity : AppCompatActivity() {
             val alert: AlertDialog.Builder = AlertDialog.Builder(this)
 
             alert.setTitle(name)
-            alert.setMessage("Set price (RUB):")
+            alert.setMessage(R.string.set_price_message)
 
             val input = EditText(this)
             alert.setView(input)
 
-            alert.setPositiveButton("Ok") { dialog, whichButton ->
+            alert.setPositiveButton(R.string.positive_answer) { _, _ ->
                 val value: String = input.text.toString()
 
                 try {
                     val price = value.toLong()
                     connection.addToSale(itemId, price)
+                    swipeRefreshLayout.isRefreshing = true
+                    connection.updateInventoryItems()
                 } catch (e : Exception) { }
             }
 
-            alert.setNegativeButton("Cancel") { _, _ -> }
+            alert.setNegativeButton(R.string.cancel_answer) { _, _ -> }
 
             alert.show()
         }
@@ -90,24 +85,6 @@ class InventoryActivity : AppCompatActivity() {
             connection.stop()
             startActivity(intent)
         }
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.menu_main, menu)
-        return true
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_settings -> true
-            else -> super.onOptionsItemSelected(item)
-        }
-    }
-
-    override fun onSupportNavigateUp(): Boolean {
-        val navController = findNavController(R.id.nav_host_fragment_content_main)
-        return navController.navigateUp(appBarConfiguration)
-                || super.onSupportNavigateUp()
     }
 
     private fun setList(items : List<InventoryItemModel>) {
