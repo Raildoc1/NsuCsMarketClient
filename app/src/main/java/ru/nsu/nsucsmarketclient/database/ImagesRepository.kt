@@ -1,6 +1,8 @@
 package ru.nsu.nsucsmarketclient.database
 
-class ImagesRepository(private val imagesDao: ImagesDao) {
+import javax.inject.Inject
+
+class ImagesRepository @Inject constructor (private val imagesDao: ImagesDao) {
     fun findByName(name : String) : ImageRef {
         return imagesDao.findByName(name)
     }

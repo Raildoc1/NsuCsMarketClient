@@ -40,14 +40,10 @@ class MarketItemsViewModel @Inject constructor() : ViewModel() {
 
     private fun onShowcaseRefreshed(l : List<ItemModel>) {
         showcaseRefreshedCallback(l)
-//        if(this::showcaseRefreshedCallback.isInitialized) {
-//        }
     }
 
     private fun onInventoryRefreshed(l : List<InventoryItemModel>) {
         inventoryRefreshedCallback(l)
-//        if(this::showcaseRefreshedCallback.isInitialized) {
-//        }
     }
 
     fun setShowcaseRefreshedCallback(action : (List<ItemModel>) -> Unit) {

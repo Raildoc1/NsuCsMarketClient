@@ -13,13 +13,17 @@ import androidx.recyclerview.widget.DefaultItemAnimator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import dagger.hilt.android.AndroidEntryPoint
 import ru.nsu.nsucsmarketclient.R
+import ru.nsu.nsucsmarketclient.database.ImagesDao
 import ru.nsu.nsucsmarketclient.databinding.FragmentShowcaseBinding
 import ru.nsu.nsucsmarketclient.network.MarketRequest
 import ru.nsu.nsucsmarketclient.network.models.ItemModel
 import ru.nsu.nsucsmarketclient.viewmodels.MarketItemsViewModel
+import javax.inject.Inject
 
-class ShowcaseFragment() : Fragment() {
+@AndroidEntryPoint
+class ShowcaseFragment : Fragment() {
 
     private var _binding: FragmentShowcaseBinding? = null
 
@@ -28,6 +32,9 @@ class ShowcaseFragment() : Fragment() {
     private val binding get() = _binding!!
 
     private val marketVM : MarketItemsViewModel by activityViewModels()
+
+    @Inject
+    lateinit var imagesDao: ImagesDao
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var recyclerViewAdapter: ShowcaseRecyclerViewAdapter
@@ -73,7 +80,7 @@ class ShowcaseFragment() : Fragment() {
 
     private fun initRecyclerView() {
         recyclerView = binding.recycleView
-        recyclerViewAdapter = ShowcaseRecyclerViewAdapter()
+        recyclerViewAdapter = ShowcaseRecyclerViewAdapter(imagesDao)
         recyclerView.setHasFixedSize(true)
         var layoutManager : RecyclerView.LayoutManager = LinearLayoutManager(activity?.applicationContext)
         recyclerView.layoutManager = layoutManager

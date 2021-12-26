@@ -14,11 +14,11 @@ import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.RecyclerView
 import ru.nsu.nsucsmarketclient.R
 import ru.nsu.nsucsmarketclient.network.models.ItemModel
-import ru.nsu.nsucsmarketclient.database.AppDatabase
+import ru.nsu.nsucsmarketclient.database.ImagesDao
 import java.io.InputStream
 import java.net.URL
 
-class ShowcaseRecyclerViewAdapter : RecyclerView.Adapter<ShowcaseRecyclerViewAdapter.ViewHolder> () {
+class ShowcaseRecyclerViewAdapter(private val imagesDao : ImagesDao) : RecyclerView.Adapter<ShowcaseRecyclerViewAdapter.ViewHolder> () {
 
     private val dataSet = ArrayList<ItemModel>()
     private lateinit var context : Context
@@ -47,7 +47,6 @@ class ShowcaseRecyclerViewAdapter : RecyclerView.Adapter<ShowcaseRecyclerViewAda
 
         Thread {
             var d : Drawable? = try {
-                val imagesDao = AppDatabase.getDatabase(context).imagesDao()
                 val ref = imagesDao.findByName("${item.classid}_${item.instanceid}")
                 var url = URL("https://steamcommunity-a.akamaihd.net/economy/image/${ref.ref}")
                 var input : InputStream = url.openStream()

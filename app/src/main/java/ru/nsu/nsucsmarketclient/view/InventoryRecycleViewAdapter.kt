@@ -12,13 +12,16 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import ru.nsu.nsucsmarketclient.R
-import ru.nsu.nsucsmarketclient.database.AppDatabase
+import ru.nsu.nsucsmarketclient.database.ImagesDao
 import ru.nsu.nsucsmarketclient.network.models.InventoryItemModel
 import java.io.InputStream
 import java.net.URL
 
-class InventoryRecycleViewAdapter(private val onItemClick: (String, String) -> Unit) : RecyclerView.Adapter<InventoryRecycleViewAdapter.ViewHolder> () {
+class InventoryRecycleViewAdapter(private val imagesDao : ImagesDao, private val onItemClick: (String, String) -> Unit) : RecyclerView.Adapter<InventoryRecycleViewAdapter.ViewHolder> () {
 
     private val dataSet = ArrayList<InventoryItemModel>()
     private lateinit var context : Context
@@ -45,9 +48,9 @@ class InventoryRecycleViewAdapter(private val onItemClick: (String, String) -> U
         val item = dataSet[position]
         holder.name.text = item.market_hash_name
         holder.bind(item.market_hash_name, item.id)
-        Thread {
+
+        CoroutineScope(Dispatchers.Default).launch {
             var d : Drawable? = try {
-                val imagesDao = AppDatabase.getDatabase(context).imagesDao()
                 val ref = imagesDao.findByName("${item.classid}_${item.instanceid}")
                 var url = URL("https://steamcommunity-a.akamaihd.net/economy/image/${ref.ref}")
                 var input : InputStream = url.openStream()
@@ -60,7 +63,7 @@ class InventoryRecycleViewAdapter(private val onItemClick: (String, String) -> U
             Handler(Looper.getMainLooper()).post {
                 holder.icon.setImageDrawable(d)
             }
-        }.start()
+        }
     }
 
     override fun getItemCount() = dataSet.size;

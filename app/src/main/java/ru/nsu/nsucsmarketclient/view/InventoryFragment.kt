@@ -2,22 +2,24 @@ package ru.nsu.nsucsmarketclient.view
 
 import android.app.AlertDialog
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import dagger.hilt.android.AndroidEntryPoint
 import ru.nsu.nsucsmarketclient.R
+import ru.nsu.nsucsmarketclient.database.ImagesDao
 import ru.nsu.nsucsmarketclient.databinding.FragmentInventoryBinding
 import ru.nsu.nsucsmarketclient.network.models.InventoryItemModel
 import ru.nsu.nsucsmarketclient.viewmodels.MarketItemsViewModel
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class InventoryFragment : Fragment() {
 
     private var _binding: FragmentInventoryBinding? = null
@@ -27,6 +29,9 @@ class InventoryFragment : Fragment() {
     private val binding get() = _binding!!
 
     private val marketVM : MarketItemsViewModel by activityViewModels()
+
+    @Inject
+    lateinit var imagesDao: ImagesDao
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var recyclerViewAdapter: InventoryRecycleViewAdapter
@@ -70,7 +75,7 @@ class InventoryFragment : Fragment() {
 
     private fun initRecyclerView(view: View) {
         recyclerView = binding.recycleView
-        recyclerViewAdapter = InventoryRecycleViewAdapter { name : String, id : String -> showDialogMessage(name, id, view) }
+        recyclerViewAdapter = InventoryRecycleViewAdapter(imagesDao) { name : String, id : String -> showDialogMessage(name, id, view) }
         recyclerView.setHasFixedSize(true)
         recyclerView.layoutManager = LinearLayoutManager(activity?.applicationContext)
         recyclerView.adapter = recyclerViewAdapter
@@ -97,8 +102,6 @@ class InventoryFragment : Fragment() {
         }
 
         alert.setNegativeButton(R.string.cancel_answer) { _, _ -> }
-
-        Log.d("Info", "pre show!!!!!!!!!")
 
         alert.show()
     }
