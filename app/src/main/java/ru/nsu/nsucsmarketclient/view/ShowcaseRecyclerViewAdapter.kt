@@ -18,7 +18,7 @@ import ru.nsu.nsucsmarketclient.database.AppDatabase
 import java.io.InputStream
 import java.net.URL
 
-class RecycleViewAdapter : RecyclerView.Adapter<RecycleViewAdapter.ViewHolder> () {
+class ShowcaseRecyclerViewAdapter : RecyclerView.Adapter<ShowcaseRecyclerViewAdapter.ViewHolder> () {
 
     private val dataSet = ArrayList<ItemModel>()
     private lateinit var context : Context

@@ -53,7 +53,7 @@ class InventoryRecycleViewAdapter(private val onItemClick: (String, String) -> U
                 var input : InputStream = url.openStream()
                 Drawable.createFromStream(input, "steam")
             } catch (e : Exception) {
-                Log.d("Database", "Failed to find ${item.classid}_${item.instanceid} -> ${e.message}");
+                Log.d("Database", "Failed to find ${item.classid}_${item.instanceid} -> ${e.message}")
                 AppCompatResources.getDrawable(context, R.drawable.ic_baseline_photo_camera_24)
             }
 
