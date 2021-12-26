@@ -12,10 +12,15 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.RecyclerView
+import com.squareup.picasso.Picasso
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import ru.nsu.nsucsmarketclient.R
 import ru.nsu.nsucsmarketclient.network.models.ItemModel
 import ru.nsu.nsucsmarketclient.database.ImagesDao
 import java.io.InputStream
+import java.lang.NullPointerException
 import java.net.URL
 
 class ShowcaseRecyclerViewAdapter(private val imagesDao : ImagesDao) : RecyclerView.Adapter<ShowcaseRecyclerViewAdapter.ViewHolder> () {
@@ -45,22 +50,28 @@ class ShowcaseRecyclerViewAdapter(private val imagesDao : ImagesDao) : RecyclerV
         holder.name.text = item.market_hash_name
         holder.price.text = item.price.toString()
 
-        Thread {
-            var d : Drawable? = try {
+        CoroutineScope(Dispatchers.Default).launch {
+            try {
                 val ref = imagesDao.findByName("${item.classid}_${item.instanceid}")
-                var url = URL("https://steamcommunity-a.akamaihd.net/economy/image/${ref.ref}")
-                var input : InputStream = url.openStream()
-                Drawable.createFromStream(input, "steam")
+
+                var url = "https://steamcommunity-a.akamaihd.net/economy/image/${ref.ref}"
+
+                Handler(Looper.getMainLooper()).post {
+                    Picasso.with(context)
+                        .load(url)
+                        .error(R.drawable.ic_baseline_photo_camera_24)
+                        .into(holder.icon)
+                }
             } catch (e : Exception) {
-                Log.d("Database", "Failed to find ${item.classid}_${item.instanceid} -> ${e.message}");
-                AppCompatResources.getDrawable(context, R.drawable.ic_baseline_photo_camera_24)
+                Log.d("Database", "Failed to find ${item.classid}_${item.instanceid} -> ${e.message}")
+                Handler(Looper.getMainLooper()).post {
+                    Picasso.with(context)
+                        .load(R.drawable.ic_baseline_photo_camera_24)
+                        .error(R.drawable.ic_baseline_photo_camera_24)
+                        .into(holder.icon)
+                }
             }
-
-            Handler(Looper.getMainLooper()).post {
-                holder.icon.setImageDrawable(d)
-            }
-
-        }.start()
+        }
     }
 
     override fun getItemCount() = dataSet.size;

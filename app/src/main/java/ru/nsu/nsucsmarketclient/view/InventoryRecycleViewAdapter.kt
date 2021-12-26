@@ -12,6 +12,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.RecyclerView
+import com.squareup.picasso.Picasso
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -50,18 +51,25 @@ class InventoryRecycleViewAdapter(private val imagesDao : ImagesDao, private val
         holder.bind(item.market_hash_name, item.id)
 
         CoroutineScope(Dispatchers.Default).launch {
-            var d : Drawable? = try {
+            try {
                 val ref = imagesDao.findByName("${item.classid}_${item.instanceid}")
-                var url = URL("https://steamcommunity-a.akamaihd.net/economy/image/${ref.ref}")
-                var input : InputStream = url.openStream()
-                Drawable.createFromStream(input, "steam")
+
+                var url = "https://steamcommunity-a.akamaihd.net/economy/image/${ref.ref}"
+
+                Handler(Looper.getMainLooper()).post {
+                    Picasso.with(context)
+                        .load(url)
+                        .error(R.drawable.ic_baseline_photo_camera_24)
+                        .into(holder.icon)
+                }
             } catch (e : Exception) {
                 Log.d("Database", "Failed to find ${item.classid}_${item.instanceid} -> ${e.message}")
-                AppCompatResources.getDrawable(context, R.drawable.ic_baseline_photo_camera_24)
-            }
-
-            Handler(Looper.getMainLooper()).post {
-                holder.icon.setImageDrawable(d)
+                Handler(Looper.getMainLooper()).post {
+                    Picasso.with(context)
+                        .load(R.drawable.ic_baseline_photo_camera_24)
+                        .error(R.drawable.ic_baseline_photo_camera_24)
+                        .into(holder.icon)
+                }
             }
         }
     }
