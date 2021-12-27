@@ -14,24 +14,7 @@ class MarketRequestQueue {
 
     private val okHttpClient = OkHttpClient()
 
-//    constructor() {
-//        timer.schedule(1000, minRequestTimeDelta) {
-//            try {
-//                if(queue.size > 0) {
-//                    var request = queue.poll();
-//                    Log.d("Web", "Request: ${request.getURI()}");
-//                    val url = URL(request.getURI());
-//                    val response = url.readText();
-//                    Log.d("Web", "Response: $response");
-//                    request.run(response);
-//                } else {
-//                    Log.d("Info", "nothing to send!");
-//                }
-//            } catch (e : Exception) {
-//                Log.d("Web", "An exception occurred while executing web request: ${e.message}");
-//            }
-//        }
-//    }
+    private var onError: (s : String) -> Unit = { }
 
     constructor() {
         timer.schedule(1000, minRequestTimeDelta) {
@@ -39,6 +22,8 @@ class MarketRequestQueue {
                 if(queue.size > 0) {
                     var requestData = queue.poll();
                     Log.d("Web", "Request: ${requestData.getURI()}");
+
+                    onError = {s : String -> requestData.fail(s)}
 
                     var request: Request = Request.Builder().url(requestData.getURI()).build()
 
@@ -51,7 +36,10 @@ class MarketRequestQueue {
                     Log.d("Info", "nothing to send!");
                 }
             } catch (e : Exception) {
-                Log.d("Web", "An exception occurred while executing web request: ${e.message}");
+                Log.d("Web", "An exception occurred while executing web request: ${e.message}")
+                onError("An exception occurred while executing web request: ${e.message}")
+            } finally {
+                onError = { }
             }
         }
     }

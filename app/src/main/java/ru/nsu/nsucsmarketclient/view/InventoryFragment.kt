@@ -67,6 +67,11 @@ class InventoryFragment : Fragment() {
             }
         }
         marketVM.forceUpdateInventory()
+        marketVM.setWebErrorMessageHandler { s: String ->
+            run {
+                showErrorMessage(s, view)
+            }
+        }
 
         swipeRefreshLayout.setOnRefreshListener {
             marketVM.forceUpdateInventory()
@@ -124,6 +129,19 @@ class InventoryFragment : Fragment() {
             Handler(Looper.getMainLooper()).post {
                 recyclerViewAdapter.updateList(items)
             }
+        }
+    }
+
+    private fun showErrorMessage(message: String, view: View) {
+        view.post {
+            val alert: AlertDialog.Builder = AlertDialog.Builder(view.context)
+
+            alert.setTitle("Error :c")
+            alert.setMessage(message)
+
+            alert.setPositiveButton(R.string.cancel_answer) { _, _ -> }
+
+            alert.show()
         }
     }
 }

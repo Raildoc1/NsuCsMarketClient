@@ -21,6 +21,8 @@ class MarketConnectionHandler {
     private lateinit var onInventoryReceived : (List<InventoryItemModel>) -> Unit
     private lateinit var pingTimer : Timer
 
+    var onErrorMessage : (String) -> Unit = {}
+
     fun connect(secretKey: String) {
         this.secretKey = secretKey;
         startPing()
@@ -31,18 +33,19 @@ class MarketConnectionHandler {
     fun startPing() {
         pingTimer = Timer("Ping", false)
         pingTimer.schedule(0, pingTimeDelta) {
-            queue.sendRequest(MarketRequest("ping?key=$secretKey") { s -> run { print(s) } })
+            queue.sendRequest(MarketRequest("ping?key=$secretKey", { s -> run { print(s) } }, onErrorMessage))
         }
     }
 
     fun addToSale(id: String, price: Long) {
-        var priceStr : String = "${price * 100}"
-        queue.sendRequest(MarketRequest("add-to-sale?key=$secretKey&id=$id&price=$priceStr&cur=RUB") { })
+        var priceStr = "${price * 100}"
+        queue.sendRequest(MarketRequest("add-to-sale?key=$secretKey&id=$id&price=$priceStr&cur=RUB", { }, onErrorMessage))
     }
 
     fun updateSaleItems() {
-        queue.sendRequest(MarketRequest("items?key=$secretKey") { s -> run {
-            print(s);
+        queue.sendRequest(
+            MarketRequest("items?key=$secretKey", { s -> run {
+            print(s)
             if(::onItemsReceived.isInitialized)
             {
                 try {
@@ -58,11 +61,12 @@ class MarketConnectionHandler {
             } else {
                 Log.d("Info", "Nobody cares about items :c");
             }
-        } })
+        } }, onErrorMessage)
+        )
     }
 
     fun updateInventoryItems() {
-        queue.sendRequest(MarketRequest("my-inventory/?key=$secretKey") { s -> run {
+        queue.sendRequest(MarketRequest("my-inventory/?key=$secretKey", { s -> run {
             print(s);
             if(::onInventoryReceived.isInitialized)
             {
@@ -79,7 +83,8 @@ class MarketConnectionHandler {
             } else {
                 Log.d("Info", "Nobody cares about inventory :c")
             }
-        } })
+        } }, onErrorMessage)
+        )
     }
 
     fun setOnItemsReceivedListener(action : (List<ItemModel>) -> Unit) {

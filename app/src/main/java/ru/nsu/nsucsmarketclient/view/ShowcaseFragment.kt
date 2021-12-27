@@ -1,5 +1,6 @@
 package ru.nsu.nsucsmarketclient.view
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -66,6 +67,12 @@ class ShowcaseFragment : Fragment() {
         }
         marketVM.forceUpdateShowcase()
 
+        marketVM.setWebErrorMessageHandler { s: String ->
+            run {
+                showErrorMessage(s, view)
+            }
+        }
+
         binding.fab.setOnClickListener {
             findNavController().navigate(R.id.action_open_inventory)
         }
@@ -102,6 +109,19 @@ class ShowcaseFragment : Fragment() {
             Handler(Looper.getMainLooper()).post {
                 recyclerViewAdapter.updateList(items)
             }
+        }
+    }
+
+    private fun showErrorMessage(message: String, view: View) {
+        view.post {
+            val alert: AlertDialog.Builder = AlertDialog.Builder(view.context)
+
+            alert.setTitle("Error :c")
+            alert.setMessage(message)
+
+            alert.setPositiveButton(R.string.cancel_answer) { _, _ -> }
+
+            alert.show()
         }
     }
 }

@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import ru.nsu.nsucsmarketclient.network.MarketConnectionHandler
-import ru.nsu.nsucsmarketclient.network.models.InventoryItemModel
 import ru.nsu.nsucsmarketclient.network.models.ItemModel
 import javax.inject.Inject
 
@@ -46,7 +45,7 @@ class ShowcaseViewModel @Inject constructor() : ViewModel() {
         connection.updateInventoryItems()
     }
 
-    fun addToSale(id: String, price: Long) {
-        connection.addToSale(id, price)
+    fun setWebErrorMessageHandler(action : (String) -> Unit) {
+        connection.onErrorMessage = action
     }
 }
