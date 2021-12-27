@@ -5,8 +5,12 @@ import ru.nsu.nsucsmarketclient.network.MarketConnectionHandler
 
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import ru.nsu.nsucsmarketclient.database.ImagesDao
 import ru.nsu.nsucsmarketclient.network.models.InventoryItemModel
+import ru.nsu.nsucsmarketclient.network.models.ItemModel
 import javax.inject.Inject
 
 @HiltViewModel
@@ -52,14 +56,17 @@ class InventoryViewModel @Inject constructor(
         connection.onErrorMessage = action
     }
 
-    fun updateItemsUrls(items : List<InventoryItemModel>) {
-        for (i in items) {
-            try {
-                val ref = imagesDao.findByName("${i.classid}_${i.instanceid}")
-                i.url = "https://steamcommunity-a.akamaihd.net/economy/image/${ref.ref}"
-            } catch (e : Exception) {
-                i.url = "none"
+    fun updateItemsUrls(items : List<InventoryItemModel>, onFinish: (List<InventoryItemModel>) -> Unit) {
+        CoroutineScope(Dispatchers.IO).launch {
+            for (i in items) {
+                try {
+                    val ref = imagesDao.findByName("${i.classid}_${i.instanceid}")
+                    i.url = "https://steamcommunity-a.akamaihd.net/economy/image/${ref.ref}"
+                } catch (e : Exception) {
+                    i.url = "none"
+                }
             }
+            onFinish(items)
         }
     }
 }

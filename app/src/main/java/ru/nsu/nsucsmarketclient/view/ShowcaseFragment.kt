@@ -94,8 +94,7 @@ class ShowcaseFragment : Fragment() {
     }
 
     private fun onItemsReceived(items : List<ItemModel>, view: View) {
-        CoroutineScope(Dispatchers.IO).launch {
-            marketVM.updateItemsUrls(items)
+        marketVM.updateItemsUrls(items) {
             view.post {
                 recyclerViewAdapter.updateList(items)
             }

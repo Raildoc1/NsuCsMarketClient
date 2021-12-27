@@ -114,8 +114,7 @@ class InventoryFragment : Fragment() {
     }
 
     private fun onItemsReceived(items : List<InventoryItemModel>, view: View) {
-        CoroutineScope(Dispatchers.IO).launch {
-            marketVM.updateItemsUrls(items)
+        marketVM.updateItemsUrls(items) {
             view.post {
                 recyclerViewAdapter.updateList(items)
             }

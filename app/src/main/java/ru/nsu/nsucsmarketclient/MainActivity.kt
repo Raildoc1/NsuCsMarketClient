@@ -1,12 +1,8 @@
 package ru.nsu.nsucsmarketclient
 
-import android.app.AlertDialog
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
-import android.widget.EditText
-import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -16,8 +12,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import ru.nsu.nsucsmarketclient.database.ImagesDao
 import ru.nsu.nsucsmarketclient.database.TestDBDataFiller
 import ru.nsu.nsucsmarketclient.databinding.ActivityMainBinding
-import ru.nsu.nsucsmarketclient.viewmodels.InventoryViewModel
-import ru.nsu.nsucsmarketclient.viewmodels.ShowcaseViewModel
 import javax.inject.Inject
 
 @AndroidEntryPoint

@@ -3,6 +3,9 @@ package ru.nsu.nsucsmarketclient.viewmodels
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import ru.nsu.nsucsmarketclient.database.ImagesDao
 import ru.nsu.nsucsmarketclient.network.MarketConnectionHandler
 import ru.nsu.nsucsmarketclient.network.models.InventoryItemModel
@@ -47,14 +50,17 @@ class ShowcaseViewModel @Inject constructor(
         connection.onErrorMessage = action
     }
 
-    fun updateItemsUrls(items : List<ItemModel>) {
-        for (i in items) {
-            try {
-                val ref = imagesDao.findByName("${i.classid}_${i.instanceid}")
-                i.url = "https://steamcommunity-a.akamaihd.net/economy/image/${ref.ref}"
-            } catch (e : Exception) {
-                i.url = "none"
+    fun updateItemsUrls(items : List<ItemModel>, onFinish: (List<ItemModel>) -> Unit) {
+        CoroutineScope(Dispatchers.IO).launch {
+            for (i in items) {
+                try {
+                    val ref = imagesDao.findByName("${i.classid}_${i.instanceid}")
+                    i.url = "https://steamcommunity-a.akamaihd.net/economy/image/${ref.ref}"
+                } catch (e : Exception) {
+                    i.url = "none"
+                }
             }
+            onFinish(items)
         }
     }
 }
