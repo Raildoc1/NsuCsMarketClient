@@ -31,17 +31,17 @@ class MarketConnectionHandler {
     fun startPing() {
         pingTimer = Timer("Ping", false)
         pingTimer.schedule(0, pingTimeDelta) {
-            queue.SendRequest(MarketRequest("ping?key=$secretKey") { s -> run { print(s) } })
+            queue.sendRequest(MarketRequest("ping?key=$secretKey") { s -> run { print(s) } })
         }
     }
 
     fun addToSale(id: String, price: Long) {
         var priceStr : String = "${price * 100}"
-        queue.SendRequest(MarketRequest("add-to-sale?key=$secretKey&id=$id&price=$priceStr&cur=RUB") { })
+        queue.sendRequest(MarketRequest("add-to-sale?key=$secretKey&id=$id&price=$priceStr&cur=RUB") { })
     }
 
     fun updateSaleItems() {
-        queue.SendRequest(MarketRequest("items?key=$secretKey") { s -> run {
+        queue.sendRequest(MarketRequest("items?key=$secretKey") { s -> run {
             print(s);
             if(::onItemsReceived.isInitialized)
             {
@@ -62,7 +62,7 @@ class MarketConnectionHandler {
     }
 
     fun updateInventoryItems() {
-        queue.SendRequest(MarketRequest("my-inventory/?key=$secretKey") { s -> run {
+        queue.sendRequest(MarketRequest("my-inventory/?key=$secretKey") { s -> run {
             print(s);
             if(::onInventoryReceived.isInitialized)
             {

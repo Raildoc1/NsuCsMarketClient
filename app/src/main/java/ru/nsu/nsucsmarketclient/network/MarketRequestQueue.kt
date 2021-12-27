@@ -56,7 +56,7 @@ class MarketRequestQueue {
         }
     }
 
-    fun SendRequest(request : MarketRequest) {
+    fun sendRequest(request : MarketRequest) {
         queue.add(request);
     }
 

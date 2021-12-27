@@ -49,29 +49,17 @@ class ShowcaseRecyclerViewAdapter(private val imagesDao : ImagesDao) : RecyclerV
 
         holder.name.text = item.market_hash_name
         holder.price.text = item.price.toString()
-
-        CoroutineScope(Dispatchers.Default).launch {
-            try {
-                val ref = imagesDao.findByName("${item.classid}_${item.instanceid}")
-
-                var url = "https://steamcommunity-a.akamaihd.net/economy/image/${ref.ref}"
-
-                Handler(Looper.getMainLooper()).post {
-                    Picasso.with(context)
-                        .load(url)
-                        .error(R.drawable.ic_baseline_photo_camera_24)
-                        .into(holder.icon)
-                }
-            } catch (e : Exception) {
-                Log.d("Database", "Failed to find ${item.classid}_${item.instanceid} -> ${e.message}")
-                Handler(Looper.getMainLooper()).post {
-                    Picasso.with(context)
-                        .load(R.drawable.ic_baseline_photo_camera_24)
-                        .error(R.drawable.ic_baseline_photo_camera_24)
-                        .into(holder.icon)
-                }
-            }
+        
+        if(item.url == "none") {
+            Picasso.with(context)
+                .load(R.drawable.ic_baseline_photo_camera_24)
+                .into(holder.icon)
         }
+
+        Picasso.with(context)
+            .load(item.url)
+            .error(R.drawable.ic_baseline_photo_camera_24)
+            .into(holder.icon)
     }
 
     override fun getItemCount() = dataSet.size;

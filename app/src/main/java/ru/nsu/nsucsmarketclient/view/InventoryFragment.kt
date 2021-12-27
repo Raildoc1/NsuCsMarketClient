@@ -2,6 +2,8 @@ package ru.nsu.nsucsmarketclient.view
 
 import android.app.AlertDialog
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,11 +14,14 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import ru.nsu.nsucsmarketclient.R
 import ru.nsu.nsucsmarketclient.database.ImagesDao
 import ru.nsu.nsucsmarketclient.databinding.FragmentInventoryBinding
 import ru.nsu.nsucsmarketclient.network.models.InventoryItemModel
-import ru.nsu.nsucsmarketclient.viewmodels.MarketItemsViewModel
+import ru.nsu.nsucsmarketclient.viewmodels.InventoryViewModel
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -28,7 +33,7 @@ class InventoryFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
-    private val marketVM : MarketItemsViewModel by activityViewModels()
+    private val marketVM : InventoryViewModel by activityViewModels()
 
     @Inject
     lateinit var imagesDao: ImagesDao
@@ -107,7 +112,18 @@ class InventoryFragment : Fragment() {
     }
 
     private fun onItemsReceived(items : List<InventoryItemModel>) {
-        recyclerViewAdapter.updateList(items)
-        recyclerViewAdapter.notifyDataSetChanged()
+        CoroutineScope(Dispatchers.IO).launch {
+            for (i in items) {
+                try {
+                    val ref = imagesDao.findByName("${i.classid}_${i.instanceid}")
+                    i.url = "https://steamcommunity-a.akamaihd.net/economy/image/${ref.ref}"
+                } catch (e : Exception) {
+                    i.url = "none"
+                }
+            }
+            Handler(Looper.getMainLooper()).post {
+                recyclerViewAdapter.updateList(items)
+            }
+        }
     }
 }

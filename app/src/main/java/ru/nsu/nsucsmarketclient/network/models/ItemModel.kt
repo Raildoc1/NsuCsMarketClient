@@ -19,5 +19,6 @@ data class ItemModel (
     val live_time: Long,
 
     val left: Long? = null,
-    val botid: String
+    val botid: String,
+    var url: String
 )

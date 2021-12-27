@@ -13,13 +13,15 @@ import dagger.hilt.android.AndroidEntryPoint
 import ru.nsu.nsucsmarketclient.database.ImagesDao
 import ru.nsu.nsucsmarketclient.database.TestDBDataFiller
 import ru.nsu.nsucsmarketclient.databinding.ActivityMainBinding
-import ru.nsu.nsucsmarketclient.viewmodels.MarketItemsViewModel
+import ru.nsu.nsucsmarketclient.viewmodels.InventoryViewModel
+import ru.nsu.nsucsmarketclient.viewmodels.ShowcaseViewModel
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
-    private val marketVM : MarketItemsViewModel by viewModels()
+    private val inventoryVM : InventoryViewModel by viewModels()
+    private val showcaseVM : ShowcaseViewModel by viewModels()
 
     @Inject lateinit var imagesDao: ImagesDao
 
@@ -37,7 +39,8 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         appBarConfiguration = AppBarConfiguration(navController.graph)
         setupActionBarWithNavController(navController, appBarConfiguration)
-        marketVM.setConnectionListeners()
+        inventoryVM.setConnectionListeners()
+        showcaseVM.setConnectionListeners()
         TestDBDataFiller().fill(imagesDao)
     }
 

@@ -6,5 +6,6 @@ data class InventoryItemModel (
     val instanceid: String,
     val market_hash_name: String,
     val market_price: Float,
-    val tradable: Long
+    val tradable: Long,
+    var url: String
 )
