@@ -61,7 +61,7 @@ class ShowcaseFragment : Fragment() {
         initRecyclerView()
         marketVM.setShowcaseRefreshedCallback { l ->
             run {
-                onItemsReceived(l)
+                onItemsReceived(l, view)
                 swipeRefreshLayout.isRefreshing = false
             }
         }
@@ -96,7 +96,7 @@ class ShowcaseFragment : Fragment() {
         recyclerView.adapter = recyclerViewAdapter
     }
 
-    private fun onItemsReceived(items : List<ItemModel>) {
+    private fun onItemsReceived(items : List<ItemModel>, view: View) {
         CoroutineScope(Dispatchers.IO).launch {
             for (i in items) {
                 try {
@@ -106,7 +106,7 @@ class ShowcaseFragment : Fragment() {
                     i.url = "none"
                 }
             }
-            Handler(Looper.getMainLooper()).post {
+            view.post {
                 recyclerViewAdapter.updateList(items)
             }
         }

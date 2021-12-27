@@ -62,7 +62,7 @@ class InventoryFragment : Fragment() {
         initRecyclerView(view)
         marketVM.setInventoryRefreshedCallback { l ->
             run {
-                onItemsReceived(l)
+                onItemsReceived(l, view)
                 swipeRefreshLayout.isRefreshing = false
             }
         }
@@ -116,7 +116,7 @@ class InventoryFragment : Fragment() {
         alert.show()
     }
 
-    private fun onItemsReceived(items : List<InventoryItemModel>) {
+    private fun onItemsReceived(items : List<InventoryItemModel>, view: View) {
         CoroutineScope(Dispatchers.IO).launch {
             for (i in items) {
                 try {
@@ -126,7 +126,7 @@ class InventoryFragment : Fragment() {
                     i.url = "none"
                 }
             }
-            Handler(Looper.getMainLooper()).post {
+            view.post {
                 recyclerViewAdapter.updateList(items)
             }
         }
