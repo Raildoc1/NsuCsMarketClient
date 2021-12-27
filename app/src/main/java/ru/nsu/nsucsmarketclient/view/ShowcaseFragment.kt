@@ -95,9 +95,7 @@ class ShowcaseFragment : Fragment() {
 
     private fun onItemsReceived(items : List<ItemModel>, view: View) {
         marketVM.updateItemsUrls(items) {
-            view.post {
-                recyclerViewAdapter.updateList(items)
-            }
+            recyclerViewAdapter.updateList(items)
         }
     }
 

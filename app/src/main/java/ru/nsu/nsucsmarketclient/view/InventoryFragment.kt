@@ -115,9 +115,7 @@ class InventoryFragment : Fragment() {
 
     private fun onItemsReceived(items : List<InventoryItemModel>, view: View) {
         marketVM.updateItemsUrls(items) {
-            view.post {
-                recyclerViewAdapter.updateList(items)
-            }
+            recyclerViewAdapter.updateList(items)
         }
     }
 

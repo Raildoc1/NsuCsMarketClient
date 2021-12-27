@@ -60,7 +60,9 @@ class ShowcaseViewModel @Inject constructor(
                     i.url = "none"
                 }
             }
-            onFinish(items)
+            CoroutineScope(Dispatchers.Main).launch {
+                onFinish(items)
+            }
         }
     }
 }
