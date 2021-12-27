@@ -5,23 +5,21 @@ import ru.nsu.nsucsmarketclient.network.MarketConnectionHandler
 
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import ru.nsu.nsucsmarketclient.database.ImagesDao
 import ru.nsu.nsucsmarketclient.network.models.InventoryItemModel
 import javax.inject.Inject
 
 @HiltViewModel
-class InventoryViewModel @Inject constructor() : ViewModel() {
+class InventoryViewModel @Inject constructor(
+    private val connection: MarketConnectionHandler,
+    private val imagesDao: ImagesDao
+) : ViewModel() {
 
     private lateinit var inventory: List<InventoryItemModel>
 
-    @Inject
-    lateinit var connection: MarketConnectionHandler
-
     private var inventoryRefreshedCallback: (List<InventoryItemModel>) -> Unit = { }
 
-    fun setConnectionListeners() {
-        if(!this::connection.isInitialized) {
-            return
-        }
+    init {
         connection.setOnInventoryReceivedListener { l -> inventory = l; onInventoryRefreshed(l); Log.d("Info", "On received Inventory!"); }
     }
 
@@ -52,5 +50,16 @@ class InventoryViewModel @Inject constructor() : ViewModel() {
 
     fun setWebErrorMessageHandler(action : (String) -> Unit) {
         connection.onErrorMessage = action
+    }
+
+    fun updateItemsUrls(items : List<InventoryItemModel>) {
+        for (i in items) {
+            try {
+                val ref = imagesDao.findByName("${i.classid}_${i.instanceid}")
+                i.url = "https://steamcommunity-a.akamaihd.net/economy/image/${ref.ref}"
+            } catch (e : Exception) {
+                i.url = "none"
+            }
+        }
     }
 }

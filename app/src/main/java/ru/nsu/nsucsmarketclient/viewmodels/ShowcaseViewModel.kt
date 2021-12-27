@@ -3,24 +3,22 @@ package ru.nsu.nsucsmarketclient.viewmodels
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
+import ru.nsu.nsucsmarketclient.database.ImagesDao
 import ru.nsu.nsucsmarketclient.network.MarketConnectionHandler
+import ru.nsu.nsucsmarketclient.network.models.InventoryItemModel
 import ru.nsu.nsucsmarketclient.network.models.ItemModel
 import javax.inject.Inject
 
 @HiltViewModel
-class ShowcaseViewModel @Inject constructor() : ViewModel() {
+class ShowcaseViewModel @Inject constructor(
+    private val connection: MarketConnectionHandler,
+    private val imagesDao: ImagesDao
+) : ViewModel() {
 
     private lateinit var showcase: List<ItemModel>
-
-    @Inject
-    lateinit var connection: MarketConnectionHandler
-
     private var showcaseRefreshedCallback: (List<ItemModel>) -> Unit = { }
 
-    fun setConnectionListeners() {
-        if(!this::connection.isInitialized) {
-            return
-        }
+    init {
         connection.setOnItemsReceivedListener { l -> showcase = l; onShowcaseRefreshed(l); Log.d("Info", "On received showcase!"); }
     }
 
@@ -47,5 +45,16 @@ class ShowcaseViewModel @Inject constructor() : ViewModel() {
 
     fun setWebErrorMessageHandler(action : (String) -> Unit) {
         connection.onErrorMessage = action
+    }
+
+    fun updateItemsUrls(items : List<ItemModel>) {
+        for (i in items) {
+            try {
+                val ref = imagesDao.findByName("${i.classid}_${i.instanceid}")
+                i.url = "https://steamcommunity-a.akamaihd.net/economy/image/${ref.ref}"
+            } catch (e : Exception) {
+                i.url = "none"
+            }
+        }
     }
 }

@@ -36,9 +36,6 @@ class ShowcaseFragment : Fragment() {
 
     private val marketVM : ShowcaseViewModel by activityViewModels()
 
-    @Inject
-    lateinit var imagesDao: ImagesDao
-
     private lateinit var recyclerView: RecyclerView
     private lateinit var recyclerViewAdapter: ShowcaseRecyclerViewAdapter
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
@@ -89,7 +86,7 @@ class ShowcaseFragment : Fragment() {
 
     private fun initRecyclerView() {
         recyclerView = binding.recycleView
-        recyclerViewAdapter = ShowcaseRecyclerViewAdapter(imagesDao)
+        recyclerViewAdapter = ShowcaseRecyclerViewAdapter()
         recyclerView.setHasFixedSize(true)
         var layoutManager : RecyclerView.LayoutManager = LinearLayoutManager(activity?.applicationContext)
         recyclerView.layoutManager = layoutManager
@@ -98,14 +95,7 @@ class ShowcaseFragment : Fragment() {
 
     private fun onItemsReceived(items : List<ItemModel>, view: View) {
         CoroutineScope(Dispatchers.IO).launch {
-            for (i in items) {
-                try {
-                    val ref = imagesDao.findByName("${i.classid}_${i.instanceid}")
-                    i.url = "https://steamcommunity-a.akamaihd.net/economy/image/${ref.ref}"
-                } catch (e : Exception) {
-                    i.url = "none"
-                }
-            }
+            marketVM.updateItemsUrls(items)
             view.post {
                 recyclerViewAdapter.updateList(items)
             }

@@ -35,9 +35,6 @@ class InventoryFragment : Fragment() {
 
     private val marketVM : InventoryViewModel by activityViewModels()
 
-    @Inject
-    lateinit var imagesDao: ImagesDao
-
     private lateinit var recyclerView: RecyclerView
     private lateinit var recyclerViewAdapter: InventoryRecycleViewAdapter
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
@@ -85,7 +82,7 @@ class InventoryFragment : Fragment() {
 
     private fun initRecyclerView(view: View) {
         recyclerView = binding.recycleView
-        recyclerViewAdapter = InventoryRecycleViewAdapter(imagesDao) { name : String, id : String -> showDialogMessage(name, id, view) }
+        recyclerViewAdapter = InventoryRecycleViewAdapter { name : String, id : String -> showDialogMessage(name, id, view) }
         recyclerView.setHasFixedSize(true)
         recyclerView.layoutManager = LinearLayoutManager(activity?.applicationContext)
         recyclerView.adapter = recyclerViewAdapter
@@ -118,14 +115,7 @@ class InventoryFragment : Fragment() {
 
     private fun onItemsReceived(items : List<InventoryItemModel>, view: View) {
         CoroutineScope(Dispatchers.IO).launch {
-            for (i in items) {
-                try {
-                    val ref = imagesDao.findByName("${i.classid}_${i.instanceid}")
-                    i.url = "https://steamcommunity-a.akamaihd.net/economy/image/${ref.ref}"
-                } catch (e : Exception) {
-                    i.url = "none"
-                }
-            }
+            marketVM.updateItemsUrls(items)
             view.post {
                 recyclerViewAdapter.updateList(items)
             }

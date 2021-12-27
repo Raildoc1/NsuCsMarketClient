@@ -23,7 +23,7 @@ import java.io.InputStream
 import java.lang.NullPointerException
 import java.net.URL
 
-class ShowcaseRecyclerViewAdapter(private val imagesDao : ImagesDao) : RecyclerView.Adapter<ShowcaseRecyclerViewAdapter.ViewHolder> () {
+class ShowcaseRecyclerViewAdapter : RecyclerView.Adapter<ShowcaseRecyclerViewAdapter.ViewHolder> () {
 
     private val dataSet = ArrayList<ItemModel>()
     private lateinit var context : Context

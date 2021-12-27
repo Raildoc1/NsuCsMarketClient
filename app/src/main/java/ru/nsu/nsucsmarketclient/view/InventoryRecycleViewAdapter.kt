@@ -22,7 +22,7 @@ import ru.nsu.nsucsmarketclient.network.models.InventoryItemModel
 import java.io.InputStream
 import java.net.URL
 
-class InventoryRecycleViewAdapter(private val imagesDao : ImagesDao, private val onItemClick: (String, String) -> Unit) : RecyclerView.Adapter<InventoryRecycleViewAdapter.ViewHolder> () {
+class InventoryRecycleViewAdapter(private val onItemClick: (String, String) -> Unit) : RecyclerView.Adapter<InventoryRecycleViewAdapter.ViewHolder> () {
 
     private val dataSet = ArrayList<InventoryItemModel>()
     private lateinit var context : Context

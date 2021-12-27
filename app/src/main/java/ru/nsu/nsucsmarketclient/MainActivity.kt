@@ -23,9 +23,6 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
-    private val inventoryVM : InventoryViewModel by viewModels()
-    private val showcaseVM : ShowcaseViewModel by viewModels()
-
     @Inject lateinit var imagesDao: ImagesDao
 
     private lateinit var appBarConfiguration: AppBarConfiguration
@@ -42,8 +39,6 @@ class MainActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         appBarConfiguration = AppBarConfiguration(navController.graph)
         setupActionBarWithNavController(navController, appBarConfiguration)
-        inventoryVM.setConnectionListeners()
-        showcaseVM.setConnectionListeners()
         TestDBDataFiller().fill(imagesDao)
     }
 
