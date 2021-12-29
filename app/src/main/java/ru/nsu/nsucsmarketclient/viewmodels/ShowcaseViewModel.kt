@@ -11,6 +11,7 @@ import ru.nsu.nsucsmarketclient.database.ImagesDao
 import ru.nsu.nsucsmarketclient.network.MarketConnectionHandler
 import ru.nsu.nsucsmarketclient.network.models.InventoryItemModel
 import ru.nsu.nsucsmarketclient.network.models.ItemModel
+import java.lang.ref.WeakReference
 import javax.inject.Inject
 
 @HiltViewModel
@@ -47,11 +48,11 @@ class ShowcaseViewModel @Inject constructor(
         connection.updateInventoryItems()
     }
 
-    fun setWebErrorMessageHandler(action : (String) -> Unit) {
-        connection.onErrorMessage = action
+    fun setWebErrorMessageHandler(action : WeakReference<(String) -> Unit>) {
+        connection.onError = action
     }
 
-    fun updateItemsUrls(items : List<ItemModel>, onFinish: (List<ItemModel>) -> Unit) {
+    fun updateItemsUrls(items : List<ItemModel>, onFinish: WeakReference<(List<ItemModel>) -> Unit>) {
         CoroutineScope(Dispatchers.IO).launch {
             for (i in items) {
                 try {
@@ -62,7 +63,7 @@ class ShowcaseViewModel @Inject constructor(
                 }
             }
             withContext(Dispatchers.Main) {
-                onFinish(items)
+                onFinish.get()?.invoke(items)
             }
         }
     }

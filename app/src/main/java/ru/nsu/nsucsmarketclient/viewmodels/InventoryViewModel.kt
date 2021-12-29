@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import ru.nsu.nsucsmarketclient.database.ImagesDao
 import ru.nsu.nsucsmarketclient.network.models.InventoryItemModel
-import ru.nsu.nsucsmarketclient.network.models.ItemModel
+import java.lang.ref.WeakReference
 import javax.inject.Inject
 
 @HiltViewModel
@@ -53,11 +53,11 @@ class InventoryViewModel @Inject constructor(
         connection.addToSale(id, price)
     }
 
-    fun setWebErrorMessageHandler(action : (String) -> Unit) {
-        connection.onErrorMessage = action
+    fun setWebErrorMessageHandler(action : WeakReference<(String) -> Unit>) {
+        connection.onError = action
     }
 
-    fun updateItemsUrls(items : List<InventoryItemModel>, onFinish: (List<InventoryItemModel>) -> Unit) {
+    fun updateItemsUrls(items : List<InventoryItemModel>, onFinish: WeakReference<(List<InventoryItemModel>) -> Unit>) {
         CoroutineScope(Dispatchers.IO).launch {
             for (i in items) {
                 try {
@@ -68,7 +68,7 @@ class InventoryViewModel @Inject constructor(
                 }
             }
             withContext(Dispatchers.Main) {
-                onFinish(items)
+                onFinish.get()?.invoke(items)
             }
         }
     }

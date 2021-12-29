@@ -23,6 +23,7 @@ import ru.nsu.nsucsmarketclient.databinding.FragmentShowcaseBinding
 import ru.nsu.nsucsmarketclient.network.models.ItemModel
 import ru.nsu.nsucsmarketclient.viewmodels.InventoryViewModel
 import ru.nsu.nsucsmarketclient.viewmodels.ShowcaseViewModel
+import java.lang.ref.WeakReference
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -34,11 +35,13 @@ class ShowcaseFragment : Fragment() {
     // onDestroyView.
     private val binding get() = _binding!!
 
-    private val marketVM : ShowcaseViewModel by activityViewModels()
+    private val marketVM: ShowcaseViewModel by activityViewModels()
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var recyclerViewAdapter: ShowcaseRecyclerViewAdapter
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout
+
+    private lateinit var onErrorAction: (s : String) -> Unit
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -58,17 +61,13 @@ class ShowcaseFragment : Fragment() {
         initRecyclerView()
         marketVM.setShowcaseRefreshedCallback { l ->
             run {
-                onItemsReceived(l, view)
+                onItemsReceived(l)
                 swipeRefreshLayout.isRefreshing = false
             }
         }
         marketVM.forceUpdateShowcase()
-
-        marketVM.setWebErrorMessageHandler { s: String ->
-            run {
-                showErrorMessage(s, view)
-            }
-        }
+        onErrorAction = { s: String -> showErrorMessage(s, view) }
+        marketVM.setWebErrorMessageHandler(WeakReference(onErrorAction))
 
         binding.fab.setOnClickListener {
             findNavController().navigate(R.id.action_open_inventory)
@@ -88,15 +87,16 @@ class ShowcaseFragment : Fragment() {
         recyclerView = binding.recycleView
         recyclerViewAdapter = ShowcaseRecyclerViewAdapter()
         recyclerView.setHasFixedSize(true)
-        var layoutManager : RecyclerView.LayoutManager = LinearLayoutManager(activity?.applicationContext)
+        var layoutManager: RecyclerView.LayoutManager =
+            LinearLayoutManager(activity?.applicationContext)
         recyclerView.layoutManager = layoutManager
         recyclerView.adapter = recyclerViewAdapter
     }
 
-    private fun onItemsReceived(items : List<ItemModel>, view: View) {
-        marketVM.updateItemsUrls(items) {
+    private fun onItemsReceived(items: List<ItemModel>) {
+        marketVM.updateItemsUrls(items, WeakReference {
             recyclerViewAdapter.updateList(items)
-        }
+        })
     }
 
     private fun showErrorMessage(message: String, view: View) {
